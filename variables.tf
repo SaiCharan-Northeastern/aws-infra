@@ -9,8 +9,23 @@
 #   default     = "us-east-1"
 # }
 
-variable "ami_image" {
-  default = "ami-09d56f8956ab235b3"
+variable "ami_id" {
+  default = "ami-07d6c44355800b286"
+  type    = string
+}
+
+variable "instance_type" {
+  default = "t2.micro"
+  type    = string
+}
+
+variable "volume_size" {
+  default = "50"
+  type    = string
+}
+
+variable "volume_type" {
+  default = "gp2"
   type    = string
 }
 
@@ -29,6 +44,7 @@ variable "vpc_cidr_block" {
   default = "10.0.0.0/16"
   type    = string
 }
+
 
 variable "public_subnet_1" {
   default = "10.0.1.0/24"

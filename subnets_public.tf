@@ -24,5 +24,3 @@ resource "aws_subnet" "public-3" {
     Name = "Public-3"
   }
 }
-
-
