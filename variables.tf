@@ -1,89 +1,48 @@
-# variable "region_variable" {
-#   default = "us-east-1"
-# }
-
-
-
-# variable "region" {
-#   description = "AWS Deployment Region"
-#   default     = "us-east-1"
-# }
-
-variable "ami_id" {
-  default = "ami-07d6c44355800b286"
-  type    = string
+variable "region" {
+  description = "The region used to launch this module resources."
 }
-
-variable "instance_type" {
-  default = "t2.micro"
-  type    = string
-}
-
-variable "volume_size" {
-  default = "50"
-  type    = string
-}
-
-variable "volume_type" {
-  default = "gp2"
-  type    = string
-}
-
 variable "profile" {
-  default = "dev"
-  type    = string
+  description = "The profile name as set in the shared credentials file. If not set, it will be sourced from the AWS_PROFILE environment variable."
 }
 
-variable "region_variable" {
-  default = "us-east-1"
-  type    = string
+//Networking module variables
+variable "vpc_cidr" {
+  description = "CIDR for the whole VPC"
 }
 
-
-variable "vpc_cidr_block" {
-  default = "10.0.0.0/16"
-  type    = string
+variable "public_subnets_cidr" {
+  type        = list(any)
+  description = "The CIDR block for the public subnet"
 }
 
-
-variable "public_subnet_1" {
-  default = "10.0.1.0/24"
-  type    = string
+variable "private_subnets_cidr" {
+  type        = list(any)
+  description = "The CIDR block for the private subnet"
+}
+variable "availability_zones" {
+  type        = list(any)
+  description = "The az that the resources will be launched"
 }
 
-variable "private_subnet_1" {
-  default = "10.0.2.0/24"
-  type    = string
+#instance module variables
+variable "ami_id" {
+  description = "The ID of the custom AMI to use for the EC2 instance."
 }
 
-variable "public_subnet_2" {
-  default = "10.0.3.0/24"
-  type    = string
+variable "key_pair" {
+  description = "The name of the EC2 key pair to use for SSH access to the EC2 instance."
+}
+variable "database_username" {
+  description = "The username of the database"
+  default     = "csye6225"
 }
 
-variable "private_subnet_2" {
-  default = "10.0.4.0/24"
-  type    = string
+variable "database_password" {
+  description = "The password of the database"
+  default     = "Saicharan"
 }
 
-variable "public_subnet_3" {
-  default = "10.0.5.0/24"
-  type    = string
+variable "database_name" {
+  description = "The name of the database"
+  default     = "CSYEWebapp"
 }
-
-variable "private_subnet_3" {
-  default = "10.0.6.0/24"
-  type    = string
-}
-
-variable "route_table_internet_gateway_cidr"{
-  default = "0.0.0.0/0"
-  type = string
-}
-
-
-# variable "availability_zones" {
-#   type = list(string)
-#   # default     = ["us-east-1a", "us-east-1b"]
-#   description = "Describing the values for availability zones"
-# }
