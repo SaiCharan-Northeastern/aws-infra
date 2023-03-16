@@ -44,4 +44,11 @@ variable "bucket_name" {
   description = "The name of the S3 bucket"
 }
 
+variable zone_id{
+  description = "Zone id"
+}
+variable name {
+  description = "Domain name"
+}
+
 

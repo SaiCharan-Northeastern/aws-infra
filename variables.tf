@@ -46,3 +46,14 @@ variable "database_name" {
   description = "The name of the database"
   default     = "CSYEWebapp"
 }
+
+variable zone_id {
+  type = string
+  description = "Hosted zone id"
+  default = "Z010152919W5PVK5031MQ"
+}
+variable name {
+  type = string
+  description = "Domain name"
+  default = "prod.saicharanreddymyla.me"
+}
