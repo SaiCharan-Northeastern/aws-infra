@@ -50,7 +50,7 @@ resource "aws_db_instance" "db_instance" {
   multi_az                  = false
   skip_final_snapshot       = true
   final_snapshot_identifier = "final-snapshot"
-  publicly_accessible       = true
+  publicly_accessible       = false
   db_subnet_group_name      = aws_db_subnet_group.db_subnet_group.name
   tags = {
     Name = "db_instance"

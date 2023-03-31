@@ -25,6 +25,17 @@ resource "aws_s3_bucket" "mybucket" {
 
 }
 
+
+resource "aws_s3_bucket_public_access_block" "public_access" {
+  bucket = aws_s3_bucket.mybucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+
 #iam policy for ec2 to access s3
 resource "aws_iam_policy" "WebAppS3_policy" {
   name = "WebAppS3"
@@ -67,6 +78,12 @@ resource "aws_iam_role_policy_attachment" "WebAppS3_role_policy_attachment" {
   role       = aws_iam_role.WebAppS3_role.name
   policy_arn = aws_iam_policy.WebAppS3_policy.arn
 }
+
+resource "aws_iam_role_policy_attachment" "CloudwatchPolicy" {
+  role       = aws_iam_role.WebAppS3_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
 
 output "bucket_name" {
   value = aws_s3_bucket.mybucket.bucket
