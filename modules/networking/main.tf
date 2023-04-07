@@ -66,6 +66,7 @@ resource "aws_route" "public_route" {
 }
 
 
+
 /* Associate public subnet with public route table */
 resource "aws_route_table_association" "public" {
   count          = length(var.public_subnets_cidr)
