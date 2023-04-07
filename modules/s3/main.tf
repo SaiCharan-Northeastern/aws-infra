@@ -85,6 +85,16 @@ resource "aws_iam_role_policy_attachment" "CloudwatchPolicy" {
 }
 
 
+resource "aws_cloudwatch_log_group" "csye6225_lg" {
+  name = "csye6225"
+}
+
+resource "aws_cloudwatch_log_stream" "foo" {
+  name           = "webapp"
+  log_group_name = aws_cloudwatch_log_group.csye6225_lg.name
+}
+
+
 output "bucket_name" {
   value = aws_s3_bucket.mybucket.bucket
 }
