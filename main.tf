@@ -35,6 +35,7 @@ module "myinstance" {
   bucket_name         = module.myBucket.bucket_name
   zone_id = var.zone_id
   name = var.name
+  cert_arn = var.cert_arn
 
 }
 

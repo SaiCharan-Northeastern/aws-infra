@@ -52,6 +52,8 @@ resource "aws_db_instance" "db_instance" {
   final_snapshot_identifier = "final-snapshot"
   publicly_accessible       = false
   db_subnet_group_name      = aws_db_subnet_group.db_subnet_group.name
+  storage_encrypted         = true
+  kms_key_id                = aws_kms_key.rds_security_key.arn
   tags = {
     Name = "db_instance"
   }
@@ -138,7 +140,10 @@ resource "aws_launch_template" "ec2" {
       volume_size           = 50
       volume_type           = "gp2"
       delete_on_termination = true
+      encrypted             = true
+      kms_key_id            = aws_kms_key.ebs_security_key.arn
     }
+
   }
   network_interfaces {
     security_groups             = [aws_security_group.app_sg.id]
@@ -153,6 +158,7 @@ resource "aws_launch_template" "ec2" {
     "Name" = "Ec2_Tf_${timestamp()}"
   }
 }
+
 
 # EC2 instance
 # resource "aws_instance" "app_instance" {
@@ -347,16 +353,154 @@ resource "aws_lb_target_group" "alb_tg" {
     matcher             = "200"
   }
 }
+resource "aws_lb_listener_certificate" "certificate_attach" {
+  listener_arn    = aws_lb_listener.front_end.arn
+  certificate_arn = var.cert_arn
+}
 
+# Listender resource to listen for load balancer
 # Listender resource to listen for load balancer
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.lb.arn
-  port              = "80"
-  protocol          = "HTTP"
-
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.cert_arn
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alb_tg.arn
   }
 
 }
+
+# resource "aws_lb_listener" "front_end" {
+#   load_balancer_arn = aws_lb.lb.arn
+#   port              = "80"
+#   protocol          = "HTTP"
+
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.alb_tg.arn
+#   }
+
+# }
+
+resource "aws_kms_key" "ebs_security_key" {
+  description             = "My customer managed key"
+  enable_key_rotation     = true
+  deletion_window_in_days = 10
+  policy = jsonencode({
+    "Id" : "key-consolepolicy-3",
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow use of the key",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+          ]
+        },
+        "Action" : [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow attachment of persistent resources",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+          ]
+        },
+        "Action" : [
+          "kms:CreateGrant",
+          "kms:ListGrants",
+          "kms:RevokeGrant"
+        ],
+        "Resource" : "*",
+        "Condition" : {
+          "Bool" : {
+            "kms:GrantIsForAWSResource" : "true"
+          }
+        }
+      }
+    ]
+  })
+  tags = {
+    "Name" = "ec2-key"
+  }
+}
+
+
+resource "aws_kms_key" "rds_security_key" {
+  description             = "KMS key for RDS instance"
+  deletion_window_in_days = 10
+  enable_key_rotation     = true
+  policy = jsonencode({
+    "Id" : "key-consolepolicy-3",
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow use of the key",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" = "rds.amazonaws.com"
+        },
+        "Action" : [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow attachment of persistent resources",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" = "rds.amazonaws.com"
+        },
+        "Action" : [
+          "kms:CreateGrant",
+          "kms:ListGrants",
+          "kms:RevokeGrant"
+        ],
+        "Resource" : "*",
+        "Condition" : {
+          "Bool" : {
+            "kms:GrantIsForAWSResource" : "true"
+          }
+        }
+      }
+    ]
+  })
+}
+
+data "aws_caller_identity" "current" {}
