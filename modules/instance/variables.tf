@@ -50,5 +50,6 @@ variable zone_id{
 variable name {
   description = "Domain name"
 }
-
-
+ variable cert_arn {
+  description = "Certificate arn"
+ }

@@ -57,3 +57,8 @@ variable name {
   description = "Domain name"
   default = "prod.saicharanreddymyla.me"
 }
+
+variable cert_arn {
+  type = string
+  description = "Certificate ARN"
+}
