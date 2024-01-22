@@ -1,5 +1,14 @@
 # aws-infra
 
+This Repo is aimed at :
+
+Creating a VPC, public and private subnets, Route Tables and Internet Gateway
+Enabling the Launch Template to pick a recently built AMI 
+Launch EC2 instances from the AMI 
+Set up the Application Load Balancer to scale-up and scale-down based on the CloudWatch CPU Metric alarms
+Set up a public hosted zone using Route53 
+Deploy the server at https://demo.saicharanreddymyla.me
+
 
 STEPS FOR SETTING UP INFRASTRUCTURE FOR TERRAFORM:
 -> Create AWS account
