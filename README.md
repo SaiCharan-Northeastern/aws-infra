@@ -1,5 +1,15 @@
 # aws-infra
 
+This repo mainly focuses of building the infrastructure
+
+Setting up an entire VPC, public and private subnets, route tables and Internet gateway
+Launching EC2 instances from the Launch Template picking the most recent AMI
+Sacling up and down based on the CPU Metric CloudWatch Alarms
+Setting up a private hosted zone using Route53
+Deploying the web server to https://demo.saicharanreddymyla.me
+
+
+
 
 STEPS FOR SETTING UP INFRASTRUCTURE FOR TERRAFORM:
 -> Create AWS account
